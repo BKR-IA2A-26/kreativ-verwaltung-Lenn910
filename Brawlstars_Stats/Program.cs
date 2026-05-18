@@ -1,6 +1,6 @@
 using Brawlstars_Stats.Models;
 using Microsoft.EntityFrameworkCore;
-
+    
 
 var builder = WebApplication.CreateBuilder(args);
 

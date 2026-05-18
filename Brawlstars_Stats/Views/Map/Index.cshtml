@@ -1,0 +1,29 @@
+﻿@model IEnumerable<Brawlstars_Stats.Models.Map>
+
+@{
+    ViewData["Title"] = "Alle Maps";
+}
+
+<div class="container mt-4">
+    <h1 class="mb-4">Brawl Stars Maps</h1>
+
+    <table class="table table-striped table-hover table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>Map ID</th>
+                <th>Bezeichnung</th>
+                <th>Empfohlener Brawler-Typ</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var map in Model)
+            {
+                <tr>
+                    <td>@map.MapId</td>
+                    <td>@map.MapBezeichnung</td>
+                    <td>@map.EmpfohlenerTyp</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
