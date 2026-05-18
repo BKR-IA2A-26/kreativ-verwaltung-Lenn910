@@ -1,7 +1,18 @@
+using Brawlstars_Stats.Models;
+using Microsoft.EntityFrameworkCore;
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Den Connection String aus der appsettings.json laden
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// Den DbContext mit dem MySQL Provider registrieren
+builder.Services.AddDbContext<BrawlDbContext>(options =>
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
 var app = builder.Build();
 
