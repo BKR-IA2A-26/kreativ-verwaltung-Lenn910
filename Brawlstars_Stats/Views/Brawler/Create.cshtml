@@ -1,0 +1,49 @@
+﻿@model Brawlstars_Stats.Models.Brawler
+
+@{
+    ViewData["Title"] = "Neuer Brawler";
+}
+
+<div class="container mt-4">
+    <h2>Neuen Brawler hinzufügen</h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-6">
+            <form asp-action="Create">
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label">Brawler Name</label>
+                    <input asp-for="Name" class="form-control" required />
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Hp" class="form-label">HP (Leben)</label>
+                        <input asp-for="Hp" type="number" class="form-control" required />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Ang" class="form-label">Angriffsschaden</label>
+                        <input asp-for="Ang" type="number" class="form-control" required />
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Typ" class="form-label">Typ / Rolle (z.B. Assassin, Marksman)</label>
+                    <input asp-for="Typ" class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Seltenheit" class="form-label">Seltenheit (z.B. Legendär, Mythisch)</label>
+                    <input asp-for="Seltenheit" class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Skin" class="form-label">Standard Skin (Optional)</label>
+                    <input asp-for="Skin" class="form-control" />
+                </div>
+
+                <button type="submit" class="btn btn-success">Speichern</button>
+                <a asp-action="Index" class="btn btn-secondary">Zurück zur Liste</a>
+            </form>
+        </div>
+    </div>
+</div>

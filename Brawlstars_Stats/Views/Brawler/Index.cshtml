@@ -1,0 +1,40 @@
+﻿@model IEnumerable<Brawlstars_Stats.Models.Brawler>
+
+@{
+    ViewData["Title"] = "Deine Brawler";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Brawler Übersicht</h1>
+        <a asp-action="Create" class="btn btn-primary">Neuen Brawler hinzufügen</a>
+    </div>
+
+    <table class="table table-striped table-hover table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>HP</th>
+                <th>Angriff</th>
+                <th>Typ / Rolle</th>
+                <th>Seltenheit</th>
+                <th>Skin</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var brawler in Model)
+            {
+                <tr>
+                    <td>@brawler.BrawlerId</td>
+                    <td>@brawler.Name</td>
+                    <td>@brawler.Hp</td>
+                    <td>@brawler.Ang</td>
+                    <td>@brawler.Typ</td>
+                    <td>@brawler.Seltenheit</td>
+                    <td>@brawler.Skin</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
