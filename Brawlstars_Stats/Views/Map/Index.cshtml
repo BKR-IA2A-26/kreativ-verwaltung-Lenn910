@@ -1,16 +1,17 @@
-﻿@model IEnumerable<Brawlstars_Stats.Models.Map>
+@model IEnumerable<Brawlstars_Stats.Models.Map>
 
 @{
     ViewData["Title"] = "Alle Maps";
 }
 
-<div class="container mt-4">
-    <h1 class="mb-4">Brawl Stars Maps</h1>
+<div class="page-header animate-in">
+    <h2><span class="header-icon">🗺️</span> Brawl Stars Maps</h2>
+</div>
 
-    <table class="table table-striped table-hover table-bordered">
-        <thead class="table-dark">
+<div class="table-brawl-wrapper animate-in animate-in-delay-1">
+    <table class="table-brawl">
+        <thead>
             <tr>
-                <th>Map ID</th>
                 <th>Bezeichnung</th>
                 <th>Empfohlener Brawler-Typ</th>
             </tr>
@@ -19,9 +20,8 @@
             @foreach (var map in Model)
             {
                 <tr>
-                    <td>@map.MapId</td>
-                    <td>@map.MapBezeichnung</td>
-                    <td>@map.EmpfohlenerTyp</td>
+                    <td><strong>@map.MapBezeichnung</strong></td>
+                    <td><span class="badge-brawl badge-brawl-info">@map.EmpfohlenerTyp</span></td>
                 </tr>
             }
         </tbody>

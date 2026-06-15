@@ -1,86 +1,86 @@
-﻿@model IEnumerable<Brawlstars_Stats.Models.Match>
+@model IEnumerable<Brawlstars_Stats.Models.Match>
 
 @{
     ViewData["Title"] = "Match Historie";
 }
 
-<div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
-        <h2 class="fw-bold mb-0">Deine Match Historie</h2>
-        <a asp-action="Create" class="btn btn-primary rounded-pill px-4 shadow-sm">
-            + Neues Match
+<div class="container animate-in">
+    <div class="page-header">
+        <h2 class="fw-bold mb-0"><span class="header-icon">📊</span> Deine Match Historie</h2>
+        <a asp-action="Create" class="btn-brawl-primary">
+            <i class="bi bi-plus-lg"></i> Neues Match
         </a>
     </div>
 
     @if (!Model.Any())
     {
-        <div class="alert alert-info shadow-sm rounded">
-            <strong>Noch leer!</strong> Schnapp dir dein Handy, spiel eine Runde und tracke hier dein erstes Match.
+        <div class="empty-state">
+            <span class="empty-icon">🎮</span>
+            <h4>Noch leer!</h4>
+            <p>Schnapp dir dein Handy, spiel eine Runde und tracke hier dein erstes Match.</p>
         </div>
     }
     else
     {
-        <div class="card shadow border-0 bg-dark rounded">
-            <div class="card-body p-0">
-                <table class="table table-dark table-hover mb-0 align-middle text-center">
-                    <thead class="text-secondary">
+        <div class="table-brawl-wrapper animate-in-delay-1">
+            <table class="table-brawl">
+                <thead>
+                    <tr>
+                        <th class="text-start ps-4">Spieler</th>
+                        <th>Brawler</th>
+                        <th>Modus / Map</th>
+                        <th>Kills / Tode</th>
+                        <th>Schaden</th>
+                        <th>Platz</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var match in Model)
+                    {
+                        var werte = match.Wertes.FirstOrDefault();
+
                         <tr>
-                            <th class="text-start ps-4">Spieler</th>
-                            <th>Brawler</th>
-                            <th>Modus / Map</th>
-                            <th>Kills / Tode</th>
-                            <th>Schaden</th>
-                            <th>Platz</th>
+                            <td class="text-start ps-4">
+                                <span class="badge-brawl badge-brawl-tag">@match.Kuerzel</span>
+                            </td>
+
+                            <td class="brawler-name">
+                                @match.Brawler?.Name
+                            </td>
+
+                            <td>
+                                <div class="mode-name">@match.Modi?.Bezeichnung</div>
+                                <div class="map-name">@match.Map?.MapBezeichnung</div>
+                            </td>
+
+                            <td>
+                                <span class="badge-brawl badge-brawl-kills">
+                                    @(werte?.Kills ?? 0)
+                                </span>
+                                <span class="stat-separator">/</span>
+                                <span class="badge-brawl badge-brawl-deaths">
+                                    @(werte?.Tode ?? 0)
+                                </span>
+                            </td>
+
+                            <td class="stat-damage">
+                                ⚔️ @(werte?.Schaden != null ? werte.Schaden.Value.ToString("N0") : "0")
+                            </td>
+
+                            <td>
+                                @if (werte?.Platz != null)
+                                {
+                                    <span class="stat-placement">🏆 @werte.Platz.</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var match in Model)
-                        {
-                            var werte = match.Wertes.FirstOrDefault();
-
-                            <tr>
-                                <td class="text-start ps-4">
-                                    <span class="badge bg-secondary text-light">@match.Kuerzel</span>
-                                </td>
-
-                                <td class="fw-bold text-info">
-                                    @match.Brawler?.Name
-                                </td>
-
-                                <td>
-                                    <div class="fw-bold">@match.Modi?.Bezeichnung</div>
-                                    <div class="text-muted small">@match.Map?.MapBezeichnung</div>
-                                </td>
-
-                                <td>
-                                    <span class="badge rounded-pill bg-success px-3 py-2 fs-6 shadow-sm">
-                                        @(werte?.Kills ?? 0)
-                                    </span>
-                                    <span class="fw-bold mx-1 text-muted">/</span>
-                                    <span class="badge rounded-pill bg-danger px-3 py-2 fs-6 shadow-sm">
-                                        @(werte?.Tode ?? 0)
-                                    </span>
-                                </td>
-
-                                <td class="text-warning fw-bold">
-                                    ⚔️ @(werte?.Schaden != null ? werte.Schaden.Value.ToString("N0") : "0")
-                                </td>
-
-                                <td>
-                                    @if (werte?.Platz != null)
-                                    {
-                                        <span class="badge bg-light text-dark fs-6">🏆 @werte.Platz.</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">-</span>
-                                    }
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
+                    }
+                </tbody>
+            </table>
         </div>
     }
 </div>

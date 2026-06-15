@@ -1,73 +1,78 @@
-﻿@model Brawlstars_Stats.Models.Match
+@model Brawlstars_Stats.Models.Match
 
 @{
     ViewData["Title"] = "Match eintragen";
 }
 
-<div class="container mt-4">
-    <h2>Neues Match & Stats tracken</h2>
-    <hr />
+<div class="container mt-4 animate-in">
+    <div class="page-header">
+        <h2 class="fw-bold mb-0"><span class="header-icon">🎮</span> Neues Match & Stats tracken</h2>
+    </div>
 
-    <form asp-action="Create">
-        <div class="row">
-            <div class="col-md-6">
-                <h4 class="text-primary">Spiel-Details</h4>
+    <div class="form-card">
+        <form asp-action="Create" class="form-brawl">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="section-title"><i class="bi bi-joystick"></i> Spiel-Details</div>
 
-                <div class="mb-3">
-                    <label asp-for="Kuerzel" class="form-label">Spieler-Kürzel (Tag)</label>
-                    <input asp-for="Kuerzel" class="form-control" placeholder="#X29V..." required />
+                    <div class="mb-3">
+                        <label asp-for="Kuerzel" class="form-label">Spieler-Kürzel (Tag)</label>
+                        <input asp-for="Kuerzel" class="form-control" placeholder="#X29V..." required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Gespielter Brawler</label>
+                        <select asp-for="BrawlerId" class="form-control form-select" asp-items="ViewBag.BrawlerId" required>
+                            <option value="">-- Brawler wählen --</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Spielmodus</label>
+                        <select asp-for="ModiId" class="form-control form-select" asp-items="ViewBag.ModiId" required>
+                            <option value="">-- Modus wählen --</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Map</label>
+                        <select asp-for="MapId" class="form-control form-select" asp-items="ViewBag.MapId" required>
+                            <option value="">-- Map wählen --</option>
+                        </select>
+                    </div>
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label">Gespielter Brawler</label>
-                    <select asp-for="BrawlerId" class="form-control" asp-items="ViewBag.BrawlerId" required>
-                        <option value="">-- Brawler wählen --</option>
-                    </select>
-                </div>
+                <div class="col-md-6">
+                    <div class="section-title text-success"><i class="bi bi-graph-up"></i> Deine Performance (Werte)</div>
 
-                <div class="mb-3">
-                    <label class="form-label">Spielmodus</label>
-                    <select asp-for="ModiId" class="form-control" asp-items="ViewBag.ModiId" required>
-                        <option value="">-- Modus wählen --</option>
-                    </select>
-                </div>
+                    <div class="mb-3">
+                        <label class="form-label">Kills</label>
+                        <input name="Wertes[0].Kills" type="number" class="form-control" min="0" value="0" required />
+                    </div>
 
-                <div class="mb-3">
-                    <label class="form-label">Map</label>
-                    <select asp-for="MapId" class="form-control" asp-items="ViewBag.MapId" required>
-                        <option value="">-- Map wählen --</option>
-                    </select>
+                    <div class="mb-3">
+                        <label class="form-label">Tode</label>
+                        <input name="Wertes[0].Tode" type="number" class="form-control" min="0" value="0" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Schaden ausgeteilt</label>
+                        <input name="Wertes[0].Schaden" type="number" class="form-control" min="0" value="0" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Platzierung (für Showdown)</label>
+                        <input name="Wertes[0].Platz" type="number" class="form-control" min="1" max="10" placeholder="Optional" />
+                    </div>
                 </div>
             </div>
 
-            <div class="col-md-6">
-                <h4 class="text-success">Deine Performance (Werte)</h4>
+            <hr class="form-divider" />
 
-                <div class="mb-3">
-                    <label class="form-label">Kills</label>
-                    <input name="Wertes[0].Kills" type="number" class="form-control" min="0" value="0" required />
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Tode</label>
-                    <input name="Wertes[0].Tode" type="number" class="form-control" min="0" value="0" required />
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Schaden ausgeteilt</label>
-                    <input name="Wertes[0].Schaden" type="number" class="form-control" min="0" value="0" required />
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Platzierung (für Showdown)</label>
-                    <input name="Wertes[0].Platz" type="number" class="form-control" min="1" max="10" placeholder="Optional" />
-                </div>
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn-brawl-success btn-brawl-lg"><i class="bi bi-rocket-takeoff"></i> Match speichern</button>
+                <a asp-action="Index" class="btn-brawl-secondary btn-brawl-lg"><i class="bi bi-arrow-left"></i> Zurück</a>
             </div>
-        </div>
-
-        <div class="mt-4">
-            <button type="submit" class="btn btn-success btn-lg">Match speichern 🚀</button>
-            <a asp-action="Index" class="btn btn-secondary btn-lg">Zurück zur Übersicht</a>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>

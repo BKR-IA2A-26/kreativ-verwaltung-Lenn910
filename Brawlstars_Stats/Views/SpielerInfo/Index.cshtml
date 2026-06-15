@@ -1,32 +1,74 @@
-﻿@model IEnumerable<Brawlstars_Stats.Models.SpielerInfo>
+@model IEnumerable<Brawlstars_Stats.Models.SpielerInfo>
 
 @{
-    ViewData["Title"] = "Spieler Profile";
+    ViewData["Title"] = "Global Leaderboard";
+
+    // Calculate Brawl-Score dynamically
+    var rankedPlayers = Model.Select(s => {
+        int kills = s.GesamteKills ?? 0;
+        int deaths = s.GesamteTode ?? 0;
+        float kd = deaths == 0 ? kills : (float)kills / deaths;
+        
+        // Custom ELO Logic: 10 points per Kill, -5 per Death. Multiply by WinPercent if available.
+        int score = (kills * 10) - (deaths * 5);
+        if (score < 0) score = 0;
+
+        // Determine dynamic Title based on KD
+        string title = "Brawler";
+        if (kd > 2.5) title = "Gottgleich 👑";
+        else if (kd > 1.5) title = "Meister ⚔️";
+        else if (kd > 1.0) title = "Veteran 🛡️";
+        else if (kd < 0.5 && deaths > 10) title = "Kanonenfutter 🎯";
+
+        return new { Player = s, Score = score, KD = kd, Title = title };
+    }).OrderByDescending(x => x.Score).ToList();
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Spieler Profile</h1>
-        <a asp-action="Create" class="btn btn-primary">Neuen Spieler registrieren</a>
+<div class="page-header animate-in">
+    <div>
+        <h2><span class="header-icon">🏆</span> Global Leaderboard</h2>
+        <p class="text-muted mt-1 mb-0">Offizielles Brawl-Score Ranking basierend auf K/D und Win-Rates.</p>
     </div>
+    <a asp-action="Create" class="btn-brawl-primary">
+        <i class="bi bi-plus-lg"></i> Neuen Spieler registrieren
+    </a>
+</div>
 
-    <table class="table table-striped table-hover table-bordered">
-        <thead class="table-dark">
+<div class="table-brawl-wrapper animate-in animate-in-delay-1 mt-4">
+    <table class="table-brawl text-center">
+        <thead>
             <tr>
-                <th>Kürzel (Tag)</th>
-                <th>Spieler / Attribut</th>
-                <th>Gesamt-Kills</th>
-                <th>Gesamt-Tode</th>
+                <th class="text-start ps-4">Rang</th>
+                <th class="text-start">Spieler</th>
+                <th>Titel</th>
+                <th>K/D Ratio</th>
+                <th>Kills / Tode</th>
+                <th class="text-warning">Brawl-Score</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var spieler in Model)
+            @for (int i = 0; i < rankedPlayers.Count; i++)
             {
+                var row = rankedPlayers[i];
+                var s = row.Player;
+                
+                string rankBadge = i == 0 ? "🥇" : i == 1 ? "🥈" : i == 2 ? "🥉" : $"#{i + 1}";
+                string kdClass = row.KD >= 1.5 ? "stat-kills" : row.KD >= 1.0 ? "text-warning" : "stat-deaths";
+
                 <tr>
-                    <td><code>@spieler.Kuerzel</code></td>
-                    <td><strong>@spieler.Attribute</strong></td>
-                    <td>@spieler.GesamteKills</td>
-                    <td>@spieler.GesamteTode</td>
+                    <td class="text-start ps-4 fw-bold fs-5">@rankBadge</td>
+                    <td class="text-start">
+                        <div class="fw-bold">@s.Attribute</div>
+                        <span class="badge-brawl badge-brawl-tag mt-1">@s.Kuerzel</span>
+                    </td>
+                    <td><span class="badge-brawl badge-brawl-neutral">@row.Title</span></td>
+                    <td><span class="fw-bold @kdClass">@row.KD.ToString("0.00")</span></td>
+                    <td>
+                        <span class="text-success fw-bold">@s.GesamteKills</span>
+                        <span class="text-muted mx-1">/</span>
+                        <span class="text-danger fw-bold">@s.GesamteTode</span>
+                    </td>
+                    <td class="fw-bold fs-5 text-warning">@row.Score</td>
                 </tr>
             }
         </tbody>

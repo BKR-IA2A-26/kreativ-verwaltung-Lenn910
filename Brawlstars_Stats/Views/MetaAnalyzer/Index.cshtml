@@ -1,0 +1,111 @@
+@{
+    ViewData["Title"] = "Meta-Analyzer";
+}
+
+<div class="container mt-4 animate-in">
+    <div class="page-header text-center d-block">
+        <h2 class="fw-bold mb-2 justify-content-center"><span class="header-icon">🧠</span> Meta-Analyzer</h2>
+        <p class="text-muted">Lass die KI deine Matches analysieren und finde den besten Brawler für jede Map.</p>
+    </div>
+
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-8">
+            <div class="form-card text-center animate-in-delay-1">
+                <div class="row g-3">
+                    <div class="col-md-5">
+                        <label class="form-label text-start d-block">Wähle eine Map</label>
+                        <select id="mapSelect" class="form-control form-select form-brawl" asp-items="ViewBag.MapId">
+                            <option value="">-- Map wählen --</option>
+                        </select>
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label text-start d-block">Wähle einen Modus</label>
+                        <select id="modiSelect" class="form-control form-select form-brawl" asp-items="ViewBag.ModiId">
+                            <option value="">-- Modus wählen --</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button id="btnAnalyze" class="btn-brawl-primary w-100 justify-content-center">
+                            <i class="bi bi-search"></i> Go
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="resultsContainer" class="mt-5 d-none animate-in-delay-2">
+        <h3 class="section-title text-center mb-4"><i class="bi bi-stars text-warning"></i> KI Empfehlungen</h3>
+        
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="table-brawl-wrapper">
+                    <table class="table-brawl text-center" id="resultsTable">
+                        <thead>
+                            <tr>
+                                <th>Tier</th>
+                                <th>Brawler</th>
+                                <th>Win-Rate (Proxy)</th>
+                                <th>Ø K/D</th>
+                                <th>Gespielt</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#btnAnalyze').click(function() {
+                var mapId = $('#mapSelect').val();
+                var modiId = $('#modiSelect').val();
+
+                if(!mapId || !modiId) {
+                    alert('Bitte Map und Modus auswählen.');
+                    return;
+                }
+
+                var btn = $(this);
+                btn.html('<i class="spinner-border spinner-border-sm"></i> Lädt...');
+
+                $.get('/MetaAnalyzer/GetRecommendations', { mapId: mapId, modiId: modiId }, function(res) {
+                    btn.html('<i class="bi bi-search"></i> Go');
+                    
+                    var tbody = $('#resultsTable tbody');
+                    tbody.empty();
+
+                    if(res.success && res.data.length > 0) {
+                        $.each(res.data, function(i, item) {
+                            var tier = i === 0 ? '<span class="badge-brawl badge-brawl-warning">S-Tier 👑</span>' : 
+                                       i === 1 ? '<span class="badge-brawl badge-brawl-info">A-Tier</span>' : 
+                                       '<span class="badge-brawl badge-brawl-neutral">B-Tier</span>';
+                            
+                            var kd = item.averageDeaths === 0 ? item.averageKills.toFixed(1) : (item.averageKills / item.averageDeaths).toFixed(2);
+                            var kdBadge = kd >= 1.0 ? '<span class="stat-kills">' + kd + '</span>' : '<span class="stat-deaths">' + kd + '</span>';
+
+                            var row = '<tr>' +
+                                '<td>' + tier + '</td>' +
+                                '<td class="brawler-name">' + item.brawlerName + '</td>' +
+                                '<td><div class="progress" style="height: 20px; background-color: rgba(255,255,255,0.05);"><div class="progress-bar bg-success" style="width: ' + item.winRate + '%">' + item.winRate.toFixed(0) + '%</div></div></td>' +
+                                '<td>' + kdBadge + '</td>' +
+                                '<td>' + item.gamesPlayed + '</td>' +
+                                '</tr>';
+                            tbody.append(row);
+                        });
+                        $('#resultsContainer').removeClass('d-none');
+                    } else {
+                        tbody.append('<tr><td colspan="5" class="text-muted p-4">Nicht genügend Daten für diese Kombination. Spiel mehr Matches!</td></tr>');
+                        $('#resultsContainer').removeClass('d-none');
+                    }
+                });
+            });
+        });
+    </script>
+}

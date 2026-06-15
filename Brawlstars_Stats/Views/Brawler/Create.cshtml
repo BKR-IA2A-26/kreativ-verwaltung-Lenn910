@@ -1,49 +1,58 @@
-﻿@model Brawlstars_Stats.Models.Brawler
+@model Brawlstars_Stats.Models.Brawler
 
 @{
     ViewData["Title"] = "Neuer Brawler";
 }
 
-<div class="container mt-4">
-    <h2>Neuen Brawler hinzufügen</h2>
-    <hr />
-    <div class="row">
-        <div class="col-md-6">
-            <form asp-action="Create">
-                <div class="mb-3">
-                    <label asp-for="Name" class="form-label">Brawler Name</label>
-                    <input asp-for="Name" class="form-control" required />
-                </div>
+<div class="page-header animate-in">
+    <h2><span class="header-icon">🏆</span> Neuen Brawler hinzufügen</h2>
+</div>
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="Hp" class="form-label">HP (Leben)</label>
-                        <input asp-for="Hp" type="number" class="form-control" required />
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="Ang" class="form-label">Angriffsschaden</label>
-                        <input asp-for="Ang" type="number" class="form-control" required />
-                    </div>
-                </div>
+<div class="form-card animate-in animate-in-delay-1">
+    <h3 class="section-title"><i class="bi bi-trophy"></i> Brawler Details</h3>
+    <hr class="form-divider" />
 
-                <div class="mb-3">
-                    <label asp-for="Typ" class="form-label">Typ / Rolle (z.B. Assassin, Marksman)</label>
-                    <input asp-for="Typ" class="form-control" />
-                </div>
+    <div class="col-md-6">
+        <form asp-action="Create" class="form-brawl">
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label">Brawler Name</label>
+                <input asp-for="Name" class="form-control" required />
+            </div>
 
-                <div class="mb-3">
-                    <label asp-for="Seltenheit" class="form-label">Seltenheit (z.B. Legendär, Mythisch)</label>
-                    <input asp-for="Seltenheit" class="form-control" />
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Hp" class="form-label">HP (Leben)</label>
+                    <input asp-for="Hp" type="number" class="form-control" required />
                 </div>
-
-                <div class="mb-3">
-                    <label asp-for="Skin" class="form-label">Standard Skin (Optional)</label>
-                    <input asp-for="Skin" class="form-control" />
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Ang" class="form-label">Angriffsschaden</label>
+                    <input asp-for="Ang" type="number" class="form-control" required />
                 </div>
+            </div>
 
-                <button type="submit" class="btn btn-success">Speichern</button>
-                <a asp-action="Index" class="btn btn-secondary">Zurück zur Liste</a>
-            </form>
-        </div>
+            <div class="mb-3">
+                <label asp-for="Typ" class="form-label">Typ / Rolle (z.B. Assassin, Marksman)</label>
+                <input asp-for="Typ" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Seltenheit" class="form-label">Seltenheit (z.B. Legendär, Mythisch)</label>
+                <input asp-for="Seltenheit" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Skin" class="form-label">Standard Skin (Optional)</label>
+                <input asp-for="Skin" class="form-control" />
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn-brawl-success">
+                    <i class="bi bi-check-lg"></i> Speichern
+                </button>
+                <a asp-action="Index" class="btn-brawl-secondary">
+                    <i class="bi bi-arrow-left"></i> Zurück zur Liste
+                </a>
+            </div>
+        </form>
     </div>
 </div>

@@ -1,39 +1,45 @@
-﻿@model Brawlstars_Stats.Models.Modi
+@model Brawlstars_Stats.Models.Modi
 
 @{
     ViewData["Title"] = "Neuer Modus";
 }
 
-<div class="container mt-4">
-    <h2>Neuen Spielmodus hinzufügen</h2>
-    <hr />
-    <div class="row">
-        <div class="col-md-6">
-            <form asp-action="Create">
-                <div class="mb-3">
-                    <label asp-for="Bezeichnung" class="form-label">Modus Name (z.B. Brawlball)</label>
-                    <input asp-for="Bezeichnung" class="form-control" required />
-                </div>
+<div class="page-header animate-in">
+    <h2><span class="header-icon">⚡</span> Neuen Spielmodus hinzufügen</h2>
+</div>
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="TeamGroesse" class="form-label">Team-Größe</label>
-                        <input asp-for="TeamGroesse" type="number" class="form-control" />
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="SpielerInsg" class="form-label">Spieler insgesamt</label>
-                        <input asp-for="SpielerInsg" type="number" class="form-control" />
-                    </div>
-                </div>
+<div class="form-card animate-in animate-in-delay-1">
+    <form asp-action="Create" class="form-brawl">
+        <h3 class="section-title"><i class="bi bi-lightning"></i> Modus Details</h3>
 
-                <div class="mb-3 form-check">
-                    <input asp-for="Gift" type="checkbox" class="form-check-input" id="giftCheck" />
-                    <label class="form-check-label" for="giftCheck">Gibt es eine Gift-Wolke? (z.B. Showdown)</label>
-                </div>
-
-                <button type="submit" class="btn btn-success">Speichern</button>
-                <a asp-action="Index" class="btn btn-secondary">Zurück zur Liste</a>
-            </form>
+        <div class="mb-3">
+            <label asp-for="Bezeichnung" class="form-label">Modus Name (z.B. Brawlball)</label>
+            <input asp-for="Bezeichnung" class="form-control" required />
         </div>
-    </div>
-</div>  
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label asp-for="TeamGroesse" class="form-label">Team-Größe</label>
+                <input asp-for="TeamGroesse" type="number" class="form-control" />
+            </div>
+            <div class="col-md-6 mb-3">
+                <label asp-for="SpielerInsg" class="form-label">Spieler insgesamt</label>
+                <input asp-for="SpielerInsg" type="number" class="form-control" />
+            </div>
+        </div>
+
+        <div class="mb-3 form-check">
+            <input asp-for="Gift" type="checkbox" class="form-check-input" id="giftCheck" />
+            <label class="form-check-label" for="giftCheck">Gibt es eine Gift-Wolke? (z.B. Showdown)</label>
+        </div>
+
+        <hr class="form-divider" />
+
+        <button type="submit" class="btn-brawl-success">
+            <i class="bi bi-check-lg"></i> Speichern
+        </button>
+        <a asp-action="Index" class="btn-brawl-secondary">
+            <i class="bi bi-arrow-left"></i> Zurück zur Liste
+        </a>
+    </form>
+</div>

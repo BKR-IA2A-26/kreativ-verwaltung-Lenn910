@@ -1,28 +1,37 @@
-﻿@model Brawlstars_Stats.Models.SpielerInfo
+@model Brawlstars_Stats.Models.SpielerInfo
 
 @{
     ViewData["Title"] = "Neuer Spieler";
 }
 
-<div class="container mt-4">
-    <h2>Neuen Spieler hinzufügen</h2>
-    <hr />
-    <div class="row">
-        <div class="col-md-6">
-            <form asp-action="Create">
-                <div class="mb-3">
-                    <label asp-for="Kuerzel" class="form-label">Spieler-Kürzel / Tag (z.B. #XYZ123)</label>
-                    <input asp-for="Kuerzel" class="form-control" placeholder="#..." required />
-                </div>
+<div class="page-header animate-in">
+    <h2><span class="header-icon">👥</span> Neuen Spieler hinzufügen</h2>
+</div>
 
-                <div class="mb-3">
-                    <label asp-for="Attribute" class="form-label">Spieler Name / Bezeichnung</label>
-                    <input asp-for="Attribute" class="form-control" required />
-                </div>
+<div class="form-card animate-in animate-in-delay-1">
+    <h3 class="section-title"><i class="bi bi-person-plus"></i> Spieler Details</h3>
+    <hr class="form-divider" />
 
-                <button type="submit" class="btn btn-success">Spieler speichern</button>
-                <a asp-action="Index" class="btn btn-secondary">Zurück zur Liste</a>
-            </form>
-        </div>
+    <div class="col-md-6">
+        <form asp-action="Create" class="form-brawl">
+            <div class="mb-3">
+                <label asp-for="Kuerzel" class="form-label">Spieler-Kürzel / Tag (z.B. #XYZ123)</label>
+                <input asp-for="Kuerzel" class="form-control" placeholder="#..." required />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Attribute" class="form-label">Spieler Name / Bezeichnung</label>
+                <input asp-for="Attribute" class="form-control" required />
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn-brawl-success">
+                    <i class="bi bi-check-lg"></i> Spieler speichern
+                </button>
+                <a asp-action="Index" class="btn-brawl-secondary">
+                    <i class="bi bi-arrow-left"></i> Zurück zur Liste
+                </a>
+            </div>
+        </form>
     </div>
 </div>

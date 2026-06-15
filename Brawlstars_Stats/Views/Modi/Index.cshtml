@@ -1,19 +1,20 @@
-﻿@model IEnumerable<Brawlstars_Stats.Models.Modi>
+@model IEnumerable<Brawlstars_Stats.Models.Modi>
 
 @{
     ViewData["Title"] = "Spielmodi";
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Brawl Stars Modi</h1>
-        <a asp-action="Create" class="btn btn-primary">Neuen Modus hinzufügen</a>
-    </div>
+<div class="page-header animate-in">
+    <h2><span class="header-icon">⚡</span> Brawl Stars Modi</h2>
+    <a asp-action="Create" class="btn-brawl-primary">
+        <i class="bi bi-plus-lg"></i> Neuen Modus
+    </a>
+</div>
 
-    <table class="table table-striped table-hover table-bordered">
-        <thead class="table-dark">
+<div class="table-brawl-wrapper animate-in animate-in-delay-1">
+    <table class="table-brawl">
+        <thead>
             <tr>
-                <th>Modi ID</th>
                 <th>Bezeichnung</th>
                 <th>Team-Größe</th>
                 <th>Spieler Insg.</th>
@@ -24,11 +25,19 @@
             @foreach (var modus in Model)
             {
                 <tr>
-                    <td>@modus.ModiId</td>
-                    <td>@modus.Bezeichnung</td>
-                    <td>@modus.TeamGroesse</td> @* Tipp: Falls EF Core es anders benannt hat, hier anpassen *@
-                    <td>@modus.SpielerInsg</td>
-                    <td>@(modus.Gift == true ? "Ja" : "Nein")</td>
+                    <td><strong>@modus.Bezeichnung</strong></td>
+                    <td><span class="badge-brawl badge-brawl-neutral">@modus.TeamGroesse</span></td> @* Tipp: Falls EF Core es anders benannt hat, hier anpassen *@
+                    <td><span class="badge-brawl badge-brawl-neutral">@modus.SpielerInsg</span></td>
+                    <td>
+                        @if (modus.Gift == true)
+                        {
+                            <span class="gift-yes"><i class="bi bi-check-circle-fill"></i> Ja</span>
+                        }
+                        else
+                        {
+                            <span class="gift-no"><i class="bi bi-x-circle"></i> Nein</span>
+                        }
+                    </td>
                 </tr>
             }
         </tbody>
