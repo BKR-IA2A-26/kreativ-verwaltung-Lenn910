@@ -4,50 +4,83 @@
     ViewData["Title"] = "Match Historie";
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Deine Match Historie</h1>
-        <a asp-action="Create" class="btn btn-success">Neues Match eintragen</a>
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
+        <h2 class="fw-bold mb-0">Deine Match Historie</h2>
+        <a asp-action="Create" class="btn btn-primary rounded-pill px-4 shadow-sm">
+            + Neues Match
+        </a>
     </div>
 
     @if (!Model.Any())
     {
-        <div class="alert alert-info">Noch keine Matches eingetragen. Spiel eine Runde und tracke sie!</div>
+        <div class="alert alert-info shadow-sm rounded">
+            <strong>Noch leer!</strong> Schnapp dir dein Handy, spiel eine Runde und tracke hier dein erstes Match.
+        </div>
     }
     else
     {
-        <table class="table table-striped table-hover table-bordered align-middle">
-            <thead class="table-dark">
-                <tr>
-                    <th>Spieler</th>
-                    <th>Brawler</th>
-                    <th>Modus</th>
-                    <th>Map</th>
-                    <th>K / T</th>
-                    <th>Schaden</th>
-                    <th>Platz</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var match in Model)
-                {
-                    // Wir holen uns den ersten Werte-Eintrag aus der Sammlung
-                    var werte = match.Wertes.FirstOrDefault();
+        <div class="card shadow border-0 bg-dark rounded">
+            <div class="card-body p-0">
+                <table class="table table-dark table-hover mb-0 align-middle text-center">
+                    <thead class="text-secondary">
+                        <tr>
+                            <th class="text-start ps-4">Spieler</th>
+                            <th>Brawler</th>
+                            <th>Modus / Map</th>
+                            <th>Kills / Tode</th>
+                            <th>Schaden</th>
+                            <th>Platz</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var match in Model)
+                        {
+                            var werte = match.Wertes.FirstOrDefault();
 
-                    <tr>
-                        <td><strong>@match.Kuerzel</strong></td>
-                        <td>@match.Brawler?.Name</td>
-                        <td>@match.Modi?.Bezeichnung</td>
-                        <td>@match.Map?.MapBezeichnung</td>
-                        <td>
-                            <span class="text-success">@(werte?.Kills ?? 0)</span> /
-                            <span class="text-danger">@(werte?.Tode ?? 0)</span>
-                        </td>
-                        <td>@(werte?.Schaden != null ? werte.Schaden.Value.ToString("N0") : "0")</td>
-                        <td>@(werte?.Platz != null ? werte.Platz + "." : "-")</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                            <tr>
+                                <td class="text-start ps-4">
+                                    <span class="badge bg-secondary text-light">@match.Kuerzel</span>
+                                </td>
+
+                                <td class="fw-bold text-info">
+                                    @match.Brawler?.Name
+                                </td>
+
+                                <td>
+                                    <div class="fw-bold">@match.Modi?.Bezeichnung</div>
+                                    <div class="text-muted small">@match.Map?.MapBezeichnung</div>
+                                </td>
+
+                                <td>
+                                    <span class="badge rounded-pill bg-success px-3 py-2 fs-6 shadow-sm">
+                                        @(werte?.Kills ?? 0)
+                                    </span>
+                                    <span class="fw-bold mx-1 text-muted">/</span>
+                                    <span class="badge rounded-pill bg-danger px-3 py-2 fs-6 shadow-sm">
+                                        @(werte?.Tode ?? 0)
+                                    </span>
+                                </td>
+
+                                <td class="text-warning fw-bold">
+                                    ⚔️ @(werte?.Schaden != null ? werte.Schaden.Value.ToString("N0") : "0")
+                                </td>
+
+                                <td>
+                                    @if (werte?.Platz != null)
+                                    {
+                                        <span class="badge bg-light text-dark fs-6">🏆 @werte.Platz.</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
     }
 </div>
