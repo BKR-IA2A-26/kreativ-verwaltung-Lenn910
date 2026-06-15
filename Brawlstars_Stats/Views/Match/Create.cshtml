@@ -1,0 +1,73 @@
+﻿@model Brawlstars_Stats.Models.Match
+
+@{
+    ViewData["Title"] = "Match eintragen";
+}
+
+<div class="container mt-4">
+    <h2>Neues Match & Stats tracken</h2>
+    <hr />
+
+    <form asp-action="Create">
+        <div class="row">
+            <div class="col-md-6">
+                <h4 class="text-primary">Spiel-Details</h4>
+
+                <div class="mb-3">
+                    <label asp-for="Kuerzel" class="form-label">Spieler-Kürzel (Tag)</label>
+                    <input asp-for="Kuerzel" class="form-control" placeholder="#X29V..." required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Gespielter Brawler</label>
+                    <select asp-for="BrawlerId" class="form-control" asp-items="ViewBag.BrawlerId" required>
+                        <option value="">-- Brawler wählen --</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Spielmodus</label>
+                    <select asp-for="ModiId" class="form-control" asp-items="ViewBag.ModiId" required>
+                        <option value="">-- Modus wählen --</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Map</label>
+                    <select asp-for="MapId" class="form-control" asp-items="ViewBag.MapId" required>
+                        <option value="">-- Map wählen --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <h4 class="text-success">Deine Performance (Werte)</h4>
+
+                <div class="mb-3">
+                    <label class="form-label">Kills</label>
+                    <input name="Wertes[0].Kills" type="number" class="form-control" min="0" value="0" required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Tode</label>
+                    <input name="Wertes[0].Tode" type="number" class="form-control" min="0" value="0" required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Schaden ausgeteilt</label>
+                    <input name="Wertes[0].Schaden" type="number" class="form-control" min="0" value="0" required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Platzierung (für Showdown)</label>
+                    <input name="Wertes[0].Platz" type="number" class="form-control" min="1" max="10" placeholder="Optional" />
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-success btn-lg">Match speichern 🚀</button>
+            <a asp-action="Index" class="btn btn-secondary btn-lg">Zurück zur Übersicht</a>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,53 @@
+﻿@model IEnumerable<Brawlstars_Stats.Models.Match>
+
+@{
+    ViewData["Title"] = "Match Historie";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Deine Match Historie</h1>
+        <a asp-action="Create" class="btn btn-success">Neues Match eintragen</a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">Noch keine Matches eingetragen. Spiel eine Runde und tracke sie!</div>
+    }
+    else
+    {
+        <table class="table table-striped table-hover table-bordered align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Spieler</th>
+                    <th>Brawler</th>
+                    <th>Modus</th>
+                    <th>Map</th>
+                    <th>K / T</th>
+                    <th>Schaden</th>
+                    <th>Platz</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var match in Model)
+                {
+                    // Wir holen uns den ersten Werte-Eintrag aus der Sammlung
+                    var werte = match.Wertes.FirstOrDefault();
+
+                    <tr>
+                        <td><strong>@match.Kuerzel</strong></td>
+                        <td>@match.Brawler?.Name</td>
+                        <td>@match.Modi?.Bezeichnung</td>
+                        <td>@match.Map?.MapBezeichnung</td>
+                        <td>
+                            <span class="text-success">@(werte?.Kills ?? 0)</span> /
+                            <span class="text-danger">@(werte?.Tode ?? 0)</span>
+                        </td>
+                        <td>@(werte?.Schaden != null ? werte.Schaden.Value.ToString("N0") : "0")</td>
+                        <td>@(werte?.Platz != null ? werte.Platz + "." : "-")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

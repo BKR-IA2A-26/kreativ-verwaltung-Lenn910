@@ -1,0 +1,28 @@
+﻿@model Brawlstars_Stats.Models.SpielerInfo
+
+@{
+    ViewData["Title"] = "Neuer Spieler";
+}
+
+<div class="container mt-4">
+    <h2>Neuen Spieler hinzufügen</h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-6">
+            <form asp-action="Create">
+                <div class="mb-3">
+                    <label asp-for="Kuerzel" class="form-label">Spieler-Kürzel / Tag (z.B. #XYZ123)</label>
+                    <input asp-for="Kuerzel" class="form-control" placeholder="#..." required />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Attribute" class="form-label">Spieler Name / Bezeichnung</label>
+                    <input asp-for="Attribute" class="form-control" required />
+                </div>
+
+                <button type="submit" class="btn btn-success">Spieler speichern</button>
+                <a asp-action="Index" class="btn btn-secondary">Zurück zur Liste</a>
+            </form>
+        </div>
+    </div>
+</div>

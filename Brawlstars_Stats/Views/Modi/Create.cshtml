@@ -1,0 +1,39 @@
+﻿@model Brawlstars_Stats.Models.Modi
+
+@{
+    ViewData["Title"] = "Neuer Modus";
+}
+
+<div class="container mt-4">
+    <h2>Neuen Spielmodus hinzufügen</h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-6">
+            <form asp-action="Create">
+                <div class="mb-3">
+                    <label asp-for="Bezeichnung" class="form-label">Modus Name (z.B. Brawlball)</label>
+                    <input asp-for="Bezeichnung" class="form-control" required />
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="TeamGroesse" class="form-label">Team-Größe</label>
+                        <input asp-for="TeamGroesse" type="number" class="form-control" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="SpielerInsg" class="form-label">Spieler insgesamt</label>
+                        <input asp-for="SpielerInsg" type="number" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input asp-for="Gift" type="checkbox" class="form-check-input" id="giftCheck" />
+                    <label class="form-check-label" for="giftCheck">Gibt es eine Gift-Wolke? (z.B. Showdown)</label>
+                </div>
+
+                <button type="submit" class="btn btn-success">Speichern</button>
+                <a asp-action="Index" class="btn btn-secondary">Zurück zur Liste</a>
+            </form>
+        </div>
+    </div>
+</div>  

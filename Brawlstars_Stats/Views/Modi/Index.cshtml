@@ -1,0 +1,36 @@
+﻿@model IEnumerable<Brawlstars_Stats.Models.Modi>
+
+@{
+    ViewData["Title"] = "Spielmodi";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Brawl Stars Modi</h1>
+        <a asp-action="Create" class="btn btn-primary">Neuen Modus hinzufügen</a>
+    </div>
+
+    <table class="table table-striped table-hover table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>Modi ID</th>
+                <th>Bezeichnung</th>
+                <th>Team-Größe</th>
+                <th>Spieler Insg.</th>
+                <th>Gift-Wolke?</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var modus in Model)
+            {
+                <tr>
+                    <td>@modus.ModiId</td>
+                    <td>@modus.Bezeichnung</td>
+                    <td>@modus.TeamGroesse</td> @* Tipp: Falls EF Core es anders benannt hat, hier anpassen *@
+                    <td>@modus.SpielerInsg</td>
+                    <td>@(modus.Gift == true ? "Ja" : "Nein")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
