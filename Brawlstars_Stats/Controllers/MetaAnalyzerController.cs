@@ -16,9 +16,25 @@ namespace Brawlstars_Stats.Controllers
 
         public async Task<IActionResult> Index()
         {
+            // Initially load all maps and modes, but map dropdown will be filtered by JS when mode is selected
             ViewData["MapId"] = new SelectList(await _context.Maps.ToListAsync(), "MapId", "MapBezeichnung");
             ViewData["ModiId"] = new SelectList(await _context.Modis.ToListAsync(), "ModiId", "Bezeichnung");
             return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetMapsForModi(int modiId)
+        {
+            // Find all maps that have at least one match for the given mode
+            var maps = await _context.Matches
+                .Where(m => m.ModiId == modiId && m.Map != null)
+                .Select(m => m.Map)
+                .Distinct()
+                .Select(m => new { id = m!.MapId, bezeichnung = m.MapBezeichnung })
+                .OrderBy(m => m.bezeichnung)
+                .ToListAsync();
+
+            return Json(maps);
         }
 
         [HttpGet]

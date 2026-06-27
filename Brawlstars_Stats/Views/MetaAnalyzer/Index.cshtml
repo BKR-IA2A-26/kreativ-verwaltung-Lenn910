@@ -14,8 +14,8 @@
                 <div class="row g-3">
                     <div class="col-md-5">
                         <label class="form-label text-start d-block">Wähle eine Map</label>
-                        <select id="mapSelect" class="form-control form-select form-brawl" asp-items="ViewBag.MapId">
-                            <option value="">-- Map wählen --</option>
+                        <select id="mapSelect" class="form-control form-select form-brawl" disabled>
+                            <option value="">-- Zuerst Modus wählen --</option>
                         </select>
                     </div>
                     <div class="col-md-5">
@@ -63,12 +63,42 @@
 @section Scripts {
     <script>
         $(document).ready(function() {
+            // Load maps dynamically when Modus changes
+            $('#modiSelect').change(function() {
+                var modiId = $(this).val();
+                var mapSelect = $('#mapSelect');
+                
+                if (!modiId) {
+                    mapSelect.empty().append('<option value="">-- Zuerst Modus wählen --</option>').prop('disabled', true);
+                    return;
+                }
+
+                mapSelect.prop('disabled', true).empty().append('<option value="">-- Lade Maps... --</option>');
+
+                $.get('/MetaAnalyzer/GetMapsForModi', { modiId: modiId }, function(maps) {
+                    mapSelect.empty();
+                    if (maps.length > 0) {
+                        mapSelect.append('<option value="">-- Map wählen --</option>');
+                        $.each(maps, function(i, map) {
+                            mapSelect.append('<option value="' + map.id + '">' + map.bezeichnung + '</option>');
+                        });
+                        mapSelect.prop('disabled', false);
+                    } else {
+                        mapSelect.append('<option value="">-- Keine Maps gespielt --</option>');
+                    }
+                });
+            });
+
             $('#btnAnalyze').click(function() {
                 var mapId = $('#mapSelect').val();
                 var modiId = $('#modiSelect').val();
 
-                if(!mapId || !modiId) {
-                    alert('Bitte Map und Modus auswählen.');
+                if(!modiId) {
+                    alert('Bitte wähle zuerst einen Modus aus.');
+                    return;
+                }
+                if(!mapId) {
+                    alert('Bitte wähle eine Map aus.');
                     return;
                 }
 
@@ -101,7 +131,7 @@
                         });
                         $('#resultsContainer').removeClass('d-none');
                     } else {
-                        tbody.append('<tr><td colspan="5" class="text-muted p-4">Nicht genügend Daten für diese Kombination. Spiel mehr Matches!</td></tr>');
+                        tbody.append('<tr><td colspan="5" class="text-muted p-4"><i class="bi bi-info-circle mb-2 fs-3 d-block"></i>Nicht genügend Daten für diese Kombination.<br>Du musst zuerst Matches für diese Map/Modus-Kombination in der Match Historie eintragen!</td></tr>');
                         $('#resultsContainer').removeClass('d-none');
                     }
                 });
