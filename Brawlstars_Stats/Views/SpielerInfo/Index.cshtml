@@ -1,19 +1,23 @@
 @model IEnumerable<Brawlstars_Stats.Models.SpielerInfo>
 
 @{
-    ViewData["Title"] = "Global Leaderboard";
+    ViewData["Title"] = "Spieler Profil & Leaderboard";
+
+    var liveProfile = ViewBag.LiveProfile as Brawlstars_Stats.Services.PlayerProfileResponse;
+    var trophyLabels = ViewBag.TrophyTrendLabels as List<string> ?? new List<string>();
+    var trophyData = ViewBag.TrophyTrendData as List<int> ?? new List<int>();
+    var trophyCumulative = ViewBag.TrophyCumulative as List<int> ?? new List<int>();
+    var pushRecs = ViewBag.PushRecommendations as List<Brawlstars_Stats.Services.PlayerBrawlerStat> ?? new List<Brawlstars_Stats.Services.PlayerBrawlerStat>();
 
     // Calculate Brawl-Score dynamically
     var rankedPlayers = Model.Select(s => {
         int kills = s.GesamteKills ?? 0;
         int deaths = s.GesamteTode ?? 0;
         float kd = deaths == 0 ? kills : (float)kills / deaths;
-        
-        // Custom ELO Logic: 10 points per Kill, -5 per Death. Multiply by WinPercent if available.
+
         int score = (kills * 10) - (deaths * 5);
         if (score < 0) score = 0;
 
-        // Determine dynamic Title based on KD
         string title = "Brawler";
         if (kd > 2.5) title = "Gottgleich 👑";
         else if (kd > 1.5) title = "Meister ⚔️";
@@ -24,7 +28,164 @@
     }).OrderByDescending(x => x.Score).ToList();
 }
 
-<div class="page-header animate-in">
+<!-- ====== LIVE PLAYER CARD ====== -->
+@if (liveProfile != null)
+{
+    <div class="animate-in mb-4">
+        <div class="player-card-hero">
+            <div class="player-card-glow"></div>
+            <div class="player-card-content">
+                <!-- Left: Avatar & Identity -->
+                <div class="player-identity">
+                    <div class="player-avatar-ring">
+                        <div class="player-avatar">
+                            <span class="player-avatar-text">@liveProfile.Name.Substring(0, 1).ToUpper()</span>
+                        </div>
+                        <div class="player-level-badge">@liveProfile.ExpLevel</div>
+                    </div>
+                    <div class="player-name-block">
+                        <h2 class="player-name">@liveProfile.Name</h2>
+                        <span class="player-tag-label">@liveProfile.Tag</span>
+                        @if (!string.IsNullOrEmpty(liveProfile.Club?.Name))
+                        {
+                            <span class="player-club-badge"><i class="bi bi-shield-fill"></i> @liveProfile.Club.Name</span>
+                        }
+                    </div>
+                </div>
+
+                <!-- Right: Key Stats -->
+                <div class="player-stats-grid">
+                    <div class="player-stat-box player-stat-trophies">
+                        <div class="player-stat-icon">🏆</div>
+                        <div class="player-stat-value">@liveProfile.Trophies.ToString("N0")</div>
+                        <div class="player-stat-label">Trophäen</div>
+                        <div class="player-stat-sub">Peak: @liveProfile.HighestTrophies.ToString("N0")</div>
+                    </div>
+                    <div class="player-stat-box">
+                        <div class="player-stat-icon">⚔️</div>
+                        <div class="player-stat-value">@liveProfile.Victories3v3.ToString("N0")</div>
+                        <div class="player-stat-label">3v3 Siege</div>
+                    </div>
+                    <div class="player-stat-box">
+                        <div class="player-stat-icon">🎯</div>
+                        <div class="player-stat-value">@liveProfile.SoloVictories.ToString("N0")</div>
+                        <div class="player-stat-label">Solo Siege</div>
+                    </div>
+                    <div class="player-stat-box">
+                        <div class="player-stat-icon">👥</div>
+                        <div class="player-stat-value">@liveProfile.DuoVictories.ToString("N0")</div>
+                        <div class="player-stat-label">Duo Siege</div>
+                    </div>
+                    <div class="player-stat-box">
+                        <div class="player-stat-icon">🤖</div>
+                        <div class="player-stat-value">@(liveProfile.Brawlers?.Count ?? 0)</div>
+                        <div class="player-stat-label">Brawler</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- ====== TROPHY TREND & PUSH RECOMMENDATIONS ====== -->
+<div class="row animate-in animate-in-delay-1">
+    <!-- Trophy Trend Chart -->
+    <div class="col-md-7 mb-4">
+        <div class="card-brawl p-4 h-100">
+            <h4 class="section-title"><i class="bi bi-trophy-fill text-warning"></i> Trophäen-Verlauf (Session)</h4>
+            <p class="text-muted small mb-3">Dein kumulativer Trophäen-Gewinn/Verlust über deine letzten Spiele.</p>
+            @if (trophyCumulative.Any())
+            {
+                <div style="height: 280px; width: 100%;">
+                    <canvas id="trophyTrendChart"></canvas>
+                </div>
+            }
+            else
+            {
+                <div class="text-center text-muted py-5">
+                    <i class="bi bi-bar-chart-line fs-1 d-block mb-2"></i>
+                    Noch keine Trophäen-Daten. Synchronisiere Spiele über das Dashboard!
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Push Recommendations -->
+    <div class="col-md-5 mb-4">
+        <div class="card-brawl p-4 h-100">
+            <h4 class="section-title"><i class="bi bi-rocket-takeoff-fill text-info"></i> Push-Empfehlungen</h4>
+            <p class="text-muted small mb-3">Brawler mit hohem Power-Level aber niedrigen Trophäen – ideal zum Pushen!</p>
+            @if (pushRecs.Any())
+            {
+                <div class="push-rec-list">
+                    @foreach (var brawler in pushRecs)
+                    {
+                        int pushPotential = (brawler.Power * 100) - brawler.Trophies;
+                        if (pushPotential < 0) pushPotential = 0;
+                        string urgencyClass = pushPotential > 500 ? "push-hot" : pushPotential > 200 ? "push-warm" : "push-cool";
+
+                        <div class="push-rec-item @urgencyClass">
+                            <div class="push-rec-info">
+                                <span class="push-rec-name">
+                                    @System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(brawler.Name.ToLower())
+                                </span>
+                                <span class="push-rec-meta">
+                                    Power <strong>@brawler.Power</strong> · Rang @brawler.Rank
+                                </span>
+                            </div>
+                            <div class="push-rec-trophies">
+                                <span class="push-rec-current">🏆 @brawler.Trophies</span>
+                                <span class="push-rec-potential">+@pushPotential Potential</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-center text-muted py-5">
+                    <i class="bi bi-rocket-takeoff fs-1 d-block mb-2"></i>
+                    Keine Push-Empfehlungen verfügbar. Verbinde dein Profil!
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- ====== BRAWLER ROSTER ====== -->
+@if (liveProfile?.Brawlers != null && liveProfile.Brawlers.Any())
+{
+    <div class="animate-in animate-in-delay-2 mb-4">
+        <div class="card-brawl p-4">
+            <h4 class="section-title"><i class="bi bi-grid-3x3-gap-fill text-success"></i> Dein Brawler-Roster (@liveProfile.Brawlers.Count Brawler)</h4>
+            <p class="text-muted small mb-3">Alle deine Brawler – sortiert nach Trophäen. Klicke auf einen Spaltenkopf zum Sortieren.</p>
+            <div class="brawler-roster-grid">
+                @foreach (var b in liveProfile.Brawlers.OrderByDescending(b => b.Trophies))
+                {
+                    string powerColor = b.Power >= 11 ? "power-max" : b.Power >= 9 ? "power-high" : b.Power >= 7 ? "power-mid" : "power-low";
+                    string brawlerDisplayName = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(b.Name.ToLower());
+
+                    <div class="roster-card @powerColor">
+                        <div class="roster-card-header">
+                            <span class="roster-name">@brawlerDisplayName</span>
+                            <span class="roster-power">⚡ @b.Power</span>
+                        </div>
+                        <div class="roster-card-body">
+                            <div class="roster-trophies">
+                                <span class="roster-trophy-current">🏆 @b.Trophies</span>
+                                <span class="roster-trophy-peak">Peak: @b.HighestTrophies</span>
+                            </div>
+                            <div class="roster-rank">Rang @b.Rank</div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+<!-- ====== LEADERBOARD ====== -->
+<div class="page-header animate-in animate-in-delay-2">
     <div>
         <h2><span class="header-icon">🏆</span> Global Leaderboard</h2>
         <p class="text-muted mt-1 mb-0">Offizielles Brawl-Score Ranking basierend auf K/D und Win-Rates.</p>
@@ -34,7 +195,7 @@
     </a>
 </div>
 
-<div class="table-brawl-wrapper animate-in animate-in-delay-1 mt-4">
+<div class="table-brawl-wrapper animate-in animate-in-delay-2 mt-4">
     <table class="table-brawl text-center">
         <thead>
             <tr>
@@ -51,7 +212,7 @@
             {
                 var row = rankedPlayers[i];
                 var s = row.Player;
-                
+
                 string rankBadge = i == 0 ? "🥇" : i == 1 ? "🥈" : i == 2 ? "🥉" : $"#{i + 1}";
                 string kdClass = row.KD >= 1.5 ? "stat-kills" : row.KD >= 1.0 ? "text-warning" : "stat-deaths";
 
@@ -74,3 +235,101 @@
         </tbody>
     </table>
 </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            Chart.defaults.color = '#7986cb';
+            Chart.defaults.font.family = 'Inter';
+
+            // Trophy Trend Chart
+            var trophyLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(trophyLabels));
+            var trophyCumulative = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(trophyCumulative));
+            var trophyPerMatch = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(trophyData));
+
+            if (trophyCumulative.length > 0) {
+                var ctxTrophy = document.getElementById('trophyTrendChart').getContext('2d');
+
+                // Gradient for cumulative line
+                var gradientUp = ctxTrophy.createLinearGradient(0, 0, 0, 280);
+                gradientUp.addColorStop(0, 'rgba(76, 175, 80, 0.4)');
+                gradientUp.addColorStop(1, 'rgba(76, 175, 80, 0.0)');
+
+                new Chart(ctxTrophy, {
+                    type: 'line',
+                    data: {
+                        labels: trophyLabels,
+                        datasets: [
+                            {
+                                label: 'Kumulativ',
+                                data: trophyCumulative,
+                                borderColor: '#4caf50',
+                                backgroundColor: gradientUp,
+                                borderWidth: 3,
+                                pointBackgroundColor: function(ctx) {
+                                    var val = ctx.raw;
+                                    return val >= 0 ? '#4caf50' : '#f44336';
+                                },
+                                pointBorderColor: '#0a0e1a',
+                                pointBorderWidth: 2,
+                                pointRadius: 4,
+                                pointHoverRadius: 7,
+                                fill: true,
+                                tension: 0.3
+                            },
+                            {
+                                label: 'Pro Spiel',
+                                data: trophyPerMatch,
+                                type: 'bar',
+                                backgroundColor: function(ctx) {
+                                    var val = ctx.raw;
+                                    return val >= 0 ? 'rgba(76, 175, 80, 0.5)' : 'rgba(244, 67, 54, 0.5)';
+                                },
+                                borderColor: function(ctx) {
+                                    var val = ctx.raw;
+                                    return val >= 0 ? '#4caf50' : '#f44336';
+                                },
+                                borderWidth: 1,
+                                borderRadius: 4,
+                                barThickness: 12,
+                                order: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false
+                        },
+                        scales: {
+                            y: {
+                                grid: { color: 'rgba(255,255,255,0.05)' },
+                                ticks: {
+                                    callback: function(value) {
+                                        return (value >= 0 ? '+' : '') + value;
+                                    }
+                                }
+                            },
+                            x: { grid: { display: false } }
+                        },
+                        plugins: {
+                            legend: {
+                                labels: { usePointStyle: true, padding: 15 }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(ctx) {
+                                        var val = ctx.raw;
+                                        return ctx.dataset.label + ': ' + (val >= 0 ? '+' : '') + val + ' 🏆';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+}

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Brawlstars_Stats.Models;
@@ -8,10 +8,44 @@ namespace Brawlstars_Stats.Controllers
     public class MatchController : Controller
     {
         private readonly BrawlDbContext _context;
+        private readonly Brawlstars_Stats.Services.BrawlStarsApiService _apiService;
 
-        public MatchController(BrawlDbContext context)
+        public MatchController(BrawlDbContext context, Brawlstars_Stats.Services.BrawlStarsApiService apiService)
         {
             _context = context;
+            _apiService = apiService;
+        }
+
+        // ==========================================
+        // 0. API SYNC: Letzte Spiele von Supercell abrufen
+        // ==========================================
+        [HttpGet]
+        public async Task<IActionResult> Sync(string playerTag)
+        {
+            if (string.IsNullOrEmpty(playerTag))
+            {
+                TempData["ErrorMessage"] = "Bitte gib einen gültigen Spieler-Tag ein!";
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
+            {
+                bool success = await _apiService.SyncBattleLogAsync(playerTag);
+                if (success)
+                {
+                    TempData["SuccessMessage"] = $"Erfolgreich synchronisiert! Matches für {playerTag} wurden geladen.";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = $"Fehler beim Abrufen der Daten für {playerTag}. Überprüfe deinen API-Key und Tag!";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"API-Fehler: {ex.Message}";
+            }
+
+            return RedirectToAction(nameof(Index));
         }
 
         // ==========================================

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Brawlstars_Stats.Models;
@@ -18,6 +18,8 @@ public partial class Werte
     public int? Tode { get; set; }
 
     public int? Kills { get; set; }
+
+    public int? PokalVeraenderung { get; set; }
 
     public virtual Match? Match { get; set; }
 }

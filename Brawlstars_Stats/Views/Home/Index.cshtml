@@ -20,10 +20,10 @@
         <div class="dash-desc">Lass die KI berechnen, welcher Brawler gewinnt</div>
     </a>
 
-    <a asp-controller="SpielerInfo" asp-action="Index" class="dash-card dash-card-spieler">
-        <span class="dash-icon">🏆</span>
-        <div class="dash-title">Leaderboard</div>
-        <div class="dash-desc">Spielerprofile und Brawl-Score Rangliste</div>
+    <a asp-controller="SpielerInfo" asp-action="Index" class="dash-card dash-card-spieler" style="border-color: rgba(0, 212, 255, 0.5);">
+        <span class="dash-icon">👤</span>
+        <div class="dash-title" style="color: #00d4ff;">Spieler-Profil</div>
+        <div class="dash-desc">Live-Profil, Brawler-Roster & Push-Empfehlungen</div>
     </a>
 
     <a asp-controller="Brawler" asp-action="Index" class="dash-card dash-card-brawler">
@@ -34,18 +34,26 @@
 </div>
 
 <div class="row mt-5 animate-in-delay-2">
-    <div class="col-md-7 mb-4">
+    <div class="col-md-4 mb-4">
         <div class="card-brawl p-4 h-100">
-            <h4 class="section-title"><i class="bi bi-graph-up-arrow"></i> K/D Trend (Letzte 10 Matches)</h4>
-            <div style="height: 300px; width: 100%;">
+            <h4 class="section-title"><i class="bi bi-trophy-fill text-warning"></i> Trophäen-Session</h4>
+            <div style="height: 280px; width: 100%;">
+                <canvas id="trophyMiniChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card-brawl p-4 h-100">
+            <h4 class="section-title"><i class="bi bi-graph-up-arrow"></i> K/D Trend (Letzte 10)</h4>
+            <div style="height: 280px; width: 100%;">
                 <canvas id="kdChart"></canvas>
             </div>
         </div>
     </div>
-    <div class="col-md-5 mb-4">
+    <div class="col-md-4 mb-4">
         <div class="card-brawl p-4 h-100">
             <h4 class="section-title"><i class="bi bi-crosshair"></i> K/D pro Brawler Typ</h4>
-            <div style="height: 300px; width: 100%; display:flex; justify-content:center;">
+            <div style="height: 280px; width: 100%; display:flex; justify-content:center;">
                 <canvas id="typeRadarChart"></canvas>
             </div>
         </div>
@@ -55,12 +63,66 @@
 @section Scripts {
     <script>
         $(document).ready(function() {
-            // Chart.js Default Config for Dark Theme
             Chart.defaults.color = '#7986cb';
             Chart.defaults.font.family = 'Inter';
 
             $.get('/Home/GetChartData', function(res) {
-                // 1. Line Chart (K/D Trend)
+                // 1. Trophy Mini Chart
+                if (res.trophyCumulative && res.trophyCumulative.length > 0) {
+                    var ctxTrophy = document.getElementById('trophyMiniChart').getContext('2d');
+                    var gradientT = ctxTrophy.createLinearGradient(0, 0, 0, 280);
+                    var lastVal = res.trophyCumulative[res.trophyCumulative.length - 1];
+                    if (lastVal >= 0) {
+                        gradientT.addColorStop(0, 'rgba(76, 175, 80, 0.4)');
+                        gradientT.addColorStop(1, 'rgba(76, 175, 80, 0.0)');
+                    } else {
+                        gradientT.addColorStop(0, 'rgba(244, 67, 54, 0.4)');
+                        gradientT.addColorStop(1, 'rgba(244, 67, 54, 0.0)');
+                    }
+
+                    new Chart(ctxTrophy, {
+                        type: 'line',
+                        data: {
+                            labels: res.trophyLabels,
+                            datasets: [{
+                                label: 'Trophäen',
+                                data: res.trophyCumulative,
+                                borderColor: lastVal >= 0 ? '#4caf50' : '#f44336',
+                                backgroundColor: gradientT,
+                                borderWidth: 3,
+                                pointRadius: 3,
+                                pointHoverRadius: 6,
+                                fill: true,
+                                tension: 0.3
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    grid: { color: 'rgba(255,255,255,0.05)' },
+                                    ticks: {
+                                        callback: function(v) { return (v >= 0 ? '+' : '') + v; }
+                                    }
+                                },
+                                x: { grid: { display: false }, ticks: { display: false } }
+                            },
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(ctx) {
+                                            return (ctx.raw >= 0 ? '+' : '') + ctx.raw + ' 🏆';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // 2. Line Chart (K/D Trend)
                 var ctxLine = document.getElementById('kdChart').getContext('2d');
                 var gradientLine = ctxLine.createLinearGradient(0, 0, 0, 400);
                 gradientLine.addColorStop(0, 'rgba(0, 212, 255, 0.5)');
@@ -93,9 +155,7 @@
                                 beginAtZero: true,
                                 grid: { color: 'rgba(255,255,255,0.05)' }
                             },
-                            x: {
-                                grid: { display: false }
-                            }
+                            x: { grid: { display: false } }
                         },
                         plugins: {
                             legend: { display: false }
@@ -103,7 +163,7 @@
                     }
                 });
 
-                // 2. Radar Chart (Brawler Types)
+                // 3. Radar Chart (Brawler Types)
                 var ctxRadar = document.getElementById('typeRadarChart').getContext('2d');
                 new Chart(ctxRadar, {
                     type: 'radar',
@@ -128,7 +188,7 @@
                                 angleLines: { color: 'rgba(255,255,255,0.1)' },
                                 grid: { color: 'rgba(255,255,255,0.1)' },
                                 pointLabels: { color: '#e8eaf6', font: { size: 12 } },
-                                ticks: { display: false } // hide numbers on rings
+                                ticks: { display: false }
                             }
                         },
                         plugins: {

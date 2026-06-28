@@ -14,7 +14,24 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<BrawlDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
+// Brawl Stars API Service & HttpClient registrieren
+builder.Services.AddHttpClient<Brawlstars_Stats.Services.BrawlStarsApiService>();
+
 var app = builder.Build();
+
+// Führe sicheres DB Update beim Start aus, um die neue Trophäen-Spalte hinzuzufügen
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<BrawlDbContext>();
+    try
+    {
+        context.Database.ExecuteSqlRaw("ALTER TABLE werte ADD COLUMN pokal_veraenderung INT NULL DEFAULT 0;");
+    }
+    catch
+    {
+        // Spalte existiert wahrscheinlich bereits, Fehler ignorieren
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Pomelo.EntityFrameworkCore.MySql.Scaffolding.Internal;
@@ -190,6 +190,9 @@ public partial class BrawlDbContext : DbContext
             entity.Property(e => e.Tode)
                 .HasDefaultValueSql("'0'")
                 .HasColumnName("tode");
+            entity.Property(e => e.PokalVeraenderung)
+                .HasDefaultValueSql("'0'")
+                .HasColumnName("pokal_veraenderung");
 
             entity.HasOne(d => d.Match).WithMany(p => p.Wertes)
                 .HasForeignKey(d => d.MatchId)

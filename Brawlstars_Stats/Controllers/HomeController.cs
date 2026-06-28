@@ -68,11 +68,30 @@ namespace Brawlstars_Stats.Controllers
             var types = typePerformance.Select(t => t.Type).ToList();
             var typeAverages = typePerformance.Select(t => t.AverageKD).ToList();
 
+            // Trophy Trend (last 20 matches, cumulative)
+            var trophyMatches = await _context.Wertes
+                .OrderByDescending(w => w.WerteId)
+                .Take(20)
+                .Select(w => w.PokalVeraenderung ?? 0)
+                .ToListAsync();
+            
+            trophyMatches.Reverse();
+            var trophyCumulative = new List<int>();
+            int tSum = 0;
+            foreach (var tc in trophyMatches)
+            {
+                tSum += tc;
+                trophyCumulative.Add(tSum);
+            }
+
             return Json(new { 
                 kdLabels = matchLabels, 
                 kdData = kdTrend,
                 radarLabels = types,
-                radarData = typeAverages
+                radarData = typeAverages,
+                trophyLabels = trophyMatches.Select((_, i) => $"Spiel {i + 1}").ToList(),
+                trophyPerMatch = trophyMatches,
+                trophyCumulative = trophyCumulative
             });
         }
 
